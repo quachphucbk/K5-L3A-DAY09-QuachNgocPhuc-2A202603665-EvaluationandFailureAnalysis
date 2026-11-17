@@ -21,6 +21,22 @@ ITEMS_V2 = Path("data/eval/eval_set_v2.jsonl")
 LABELS_V2 = Path("data/eval/labels_v2.json")
 PACK = Path("data/eval/adversarial_v2.json")
 FM_MAP = Path("config/fm_map.yaml")
+FAILURE_MODES_BY_CLAIM = {
+    "C-001": ["FM-01", "FM-04"],
+    "C-002": ["FM-01", "FM-03"],
+    "C-003": ["FM-01", "FM-04"],
+    "C-004": ["FM-01"],
+    "C-005": ["FM-01"],
+    "C-006": ["FM-01", "FM-06"],
+    "C-007": ["FM-01", "FM-02"],
+    "C-008": ["FM-01", "FM-08"],
+    "C-009": ["FM-01", "FM-03"],
+    "C-010": ["FM-01", "FM-07"],
+    "C-011": ["FM-01", "FM-07"],
+    "C-012": ["FM-01", "FM-07"],
+    "C-013": ["FM-01", "FM-02", "FM-05"],
+    "C-014": ["FM-01", "FM-05", "FM-08"],
+}
 MIN_PER_MODE_V2 = 3   # v2 rule: a failure mode with < 3 items cannot show a trend, only an anecdote
 # Fields an item must carry. Labels never go inline: a grader that can read the
 # answer next to the input is a grader that can be fooled by it.
@@ -47,7 +63,7 @@ def build(source: Path = SOURCE) -> tuple[int, int]:
             "item_id": item_id,
             "claim_id": claim["claim_id"],
             # TODO M1: replace [] with the FM-xx codes from your taxonomy that this item exercises.
-            "failure_modes": [],
+            "failure_modes": FAILURE_MODES_BY_CLAIM[claim["claim_id"]].copy(),
             "provenance": {"source": "lab8_public", "matrix_id": claim.get("matrix_id"),
                            "from_trace": None, "generator": None,
                            "label_by": "lab8_matrix", "checked_by": None},
