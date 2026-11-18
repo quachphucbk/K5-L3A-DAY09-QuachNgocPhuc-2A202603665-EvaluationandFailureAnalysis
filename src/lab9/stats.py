@@ -8,6 +8,8 @@ Reference values to self-check are in tests/test_lab9_stats.py.
 from __future__ import annotations
 
 from collections.abc import Sequence
+from math import comb
+from numbers import Integral
 
 POS = "FAIL"   # the judge's job is to FIND failures, so FAIL is the positive class
 
@@ -91,13 +93,20 @@ def paired_bootstrap(a: Sequence[float], b: Sequence[float], *, n_resamples: int
 def pass_at_k(n: int, c: int, k: int) -> float:
     """Probability that AT LEAST ONE of k trials drawn from n (c of them passing) passes.
     Unbiased estimator (Chen et al. 2021): 1 - C(n-c, k) / C(n, k). Raise ValueError if k > n."""
-    # TODO M6
-    raise NotImplementedError
+    _validate_pass_k(n, c, k)
+    return 1.0 - comb(n - c, k) / comb(n, k)
 
 
 def pass_hat_k(n: int, c: int, k: int) -> float:
     """pass^k (tau-bench, Yao et al. 2024): probability that ALL k trials drawn from n pass.
     Unbiased estimator: C(c, k) / C(n, k). Raise ValueError if k > n.
     pass^k <= pass@1 <= pass@k; a reliable agent keeps pass^k close to pass@1."""
-    # TODO M6
-    raise NotImplementedError
+    _validate_pass_k(n, c, k)
+    return comb(c, k) / comb(n, k)
+
+
+def _validate_pass_k(n: int, c: int, k: int) -> None:
+    if any(isinstance(v, bool) or not isinstance(v, Integral) for v in (n, c, k)):
+        raise ValueError("n, c and k must be integers")
+    if n < 1 or not 0 <= c <= n or not 1 <= k <= n:
+        raise ValueError("require n >= 1, 0 <= c <= n and 1 <= k <= n")
